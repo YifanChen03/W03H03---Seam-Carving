@@ -1,6 +1,7 @@
 package pgdp.image;
 
 import java.util.Arrays;
+import java.awt.Color;
 
 public class SeamCarving {
 
@@ -9,8 +10,15 @@ public class SeamCarving {
 	}
 
 	public void toGradientMagnitude(int[] picture, int[] gradientMagnitude, int width, int height) {
-		for (int i = 0; i < picture.length; i++) {
+		int r1, r2;
+		int g1, g2;
+		int b1, b2;
+		int gradient_sum_x = 0;
+		int gradient_sum_y = 0;
+		int gradient_sum = 0;
+		Color px_color1, px_color2, px_color3, px_color4;
 
+		for (int i = 0; i < picture.length; i++) {
 			//mehrere if statements für mehr Klarheit
 			if (i >= 0 && i < width) {
 				//pixel aus Zeile 1
@@ -25,10 +33,44 @@ public class SeamCarving {
 				//pixel aus letzter spalte
 				gradientMagnitude[i] = Integer.MAX_VALUE;
 			} else {
-				//in x-Richtung gradientMagnitude berechnen
-				gradientMagnitude[i] = computeGradientMagnitude(picture[i - 1], picture[i + 1]);
-				//in y-Richtung gradient Magnitude berechnen und addieren
-				gradientMagnitude[i] = gradientMagnitude[i] + computeGradientMagnitude(picture[i - width], picture[i + width]);
+				//zerlege int in rgb Werte mit Java class Color
+				//in x-Richtung gradient berechnen
+				//rgb Werte von pixel eins links
+				px_color1 = new Color(picture[i - 1]);
+				r1 = px_color1.getRed();
+				g1 = px_color1.getGreen();
+				b1 = px_color1.getBlue();
+
+				//rgb Werte von pixel eins rechts
+				px_color2 = new Color(picture[i + 1]);
+				r2 = px_color2.getRed();
+				g2 = px_color2.getGreen();
+				b2 = px_color2.getBlue();
+
+				//gradient_sum_x ist Summe der drei Farbbänder in x-Richtung
+				gradient_sum_x = computeGradientMagnitude(r1, r2) + computeGradientMagnitude(g1, g2) + computeGradientMagnitude(b1, b2);
+
+				//in y-Richtung gradient berechnen
+				//rgb Werte von pixel eins drüber
+				px_color3 = new Color(picture[i - width]);
+				r1 = px_color3.getRed();
+				g1 = px_color3.getGreen();
+				b1 = px_color3.getBlue();
+
+				//rgb Werte von pixel eins drunter
+				px_color4 = new Color(picture[i + width]);
+				r2 = px_color4.getRed();
+				g2 = px_color4.getGreen();
+				b2 = px_color4.getBlue();
+
+				//gradient_sum_y ist Summe der drei Farbbänder in y-Richtung
+				gradient_sum_y = computeGradientMagnitude(r1, r2) + computeGradientMagnitude(g1, g2) + computeGradientMagnitude(b1, b2);
+
+				//x-Richtung mit y-Richtung addieren
+				gradient_sum = gradient_sum_x + gradient_sum_y;
+
+				//gradient_sum in neues Array gradientMagnitude[] schreiben
+				gradientMagnitude[i] = gradient_sum;
 			}
 		}
 	}
@@ -44,6 +86,9 @@ public class SeamCarving {
 	}
 
 	public int[] shrink(int[] image,int[] mask, int width, int height, int newWidth) {
+
+
+
 		return image;
 	}
 
