@@ -30,7 +30,7 @@ public class SeamCarving {
 			} else if (i % width == 0) {
 				//pixel aus erster spalte
 				gradientMagnitude[i] = Integer.MAX_VALUE;
-			} else if ((i + width - 1) % width == 0) {
+			} else if ((i + 1) % width == 0) {
 				//pixel aus letzter spalte
 				gradientMagnitude[i] = Integer.MAX_VALUE;
 			} else {
@@ -101,15 +101,122 @@ public class SeamCarving {
 	}
 
 	public void buildSeams(int[][] seams, long[] seamWeights, int[] gradientMagnitude, int width, int height) {
+		int px1; //px1 ist linker Pixel unter target Pixel, px2 direkt darunter, px3 rechts drunter
+		int px2;
+		int px3;
+		int current_px = 0; //veränderbare Position des jetzigen Pixels
 
+		//für jeden Pixel aus der ersten Zeile
+		for (int i = 0; i < width; i++) {
+			//falls erster Pixel oder letzter Pixel
+
+			//für die gesamte Höhe, ein ganzes vertikales Seam
+			current_px = i;
+			//Gewicht des Startpixels zu seamWeights hinzufügen
+			seamWeights[i] = gradientMagnitude[current_px];
+			for (int r = 1; r < height; r++) {
+				//prüfe falls am rand
+				if (current_px % width == 0 || (current_px + 1) % width == 0) {
+					//falls am rand
+					if (current_px % width == 0) {
+						//linker Rand
+						px2 = current_px + width;
+						px3 = current_px + width + 1;
+						if (find_lowest_weight_border(px2, px3) == 1) {
+							//px2 wählen
+							current_px = px2;
+						} else if (find_lowest_weight_border(px2, px3) == 0) {
+							//px2 wählen
+							current_px = px2;
+						} else {
+							//px3 wählen
+							current_px = px3;
+						}
+					} else {
+						//rechter Rand
+						px1 = current_px + width - 1;
+						px2 = current_px + width;
+						if (find_lowest_weight_border(px1, px2) == 1) {
+							//px2 wählen
+							current_px = px2;
+						} else if (find_lowest_weight_border(px1, px2) == 0) {
+							//px1 wählen
+							current_px = px1;
+						} else {
+							//px2 wählen
+							current_px = px2;
+						}
+					}
+				} else {
+					//alle Pixel, die nicht am Rand sind
+					px1 = current_px + width - 1;
+					px2 = current_px + width;
+					px3 = current_px + width + 1;
+
+					if (find_lowest_weight(px1, px2, px3) == 0) {
+						//px1 wählen
+						current_px = px1;
+					} else if (find_lowest_weight(px1, px2, px3) == 1) {
+						//px2 wählen
+						current_px = px2;
+					} else {
+						//px3 wählen
+						current_px = px3;
+					}
+				}
+				seamWeights[i] = seamWeights[i] + gradientMagnitude[current_px];
+			} //MUSS SCHAUEN OB ein Seam lang genug ist
+		}
+		System.out.println(Arrays.toString(seamWeights));
 	}
 
 	public void removeSeam(int[] seam, int[] image, int height, int oldWidth) {
 	}
 
+	public static int find_lowest_weight(int p1, int p2, int p3) {
+		int lowest = 0;
+
+		if (p1 != p2 && p2 != p3 && p1 != p3) {
+			//falls alle Gewichtungen verschieden
+			if (p1 < p2 && p1 < p3) {
+				//falls p1 am kleinsten
+				lowest = 0;
+			} else if (p2 < p1 && p2 < p3) {
+				//falls p2 am kleinsten
+				lowest = 1;
+			} else if (p3 < p1 && p3 < p2) {
+				//falls p3 am kleinsten
+				lowest = 2;
+			}
+		} else if (p2 <= p1 && p2 <= p3) {
+			//falls mittleres Pixel gleich oder kleiner als die anderen
+			lowest = 1;
+		} else if (p3 < p1) {
+			//falls rechtes Pixel kleiner als linkes Pixel
+			lowest = 2;
+		} else {
+			//Rest, also falls p1 == p3 oder p1 < p3
+			lowest = 0;
+		}
+		return lowest;
+	}
+
+	public static int find_lowest_weight_border(int p1, int p2) {
+		int lowest = 0;
+		if (p1 == p2) {
+			lowest = 1;
+		} else if (p1 < p2) {
+			lowest = 0;
+		} else {
+			lowest = 2;
+		}
+		return lowest;
+	}
+
 	public int[] shrink(int[] image,int[] mask, int width, int height, int newWidth) {
 		//int[] gradientMagnitude = new int[image.length];
 		//toGradientMagnitude(image, gradientMagnitude, width, height);
+		//combineMagnitudeWithMask(gradientMagnitude ,mask, width, height);
 
 		//System.out.println(mask.length);
 		//System.out.println(image.length);
@@ -117,7 +224,9 @@ public class SeamCarving {
 
 		//System.out.println(Arrays.toString(gradientMagnitude)); //gradientMagnitude beinhaltet 2816 mal Integer.MAX_VALUE, also 2816 Randpixel
 		//System.out.println(combineMagnitudeWithMask(gradientMagnitude, mask, width, height)); //62642 pixel wurden mit Maske gesichert
+		//System.out.println(image.length - height); //Ausgabe: 467250, also man soll einen vertikalen Seam löschen
 
+		//buildSeams(new int[0][0], new long[width], gradientMagnitude, width, height);
 		return image;
 	}
 
