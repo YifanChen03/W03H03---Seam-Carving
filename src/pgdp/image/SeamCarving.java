@@ -20,6 +20,7 @@ public class SeamCarving {
 
 		for (int i = 0; i < picture.length; i++) {
 			//mehrere if statements für mehr Klarheit
+			//prüfe ob pixel sich am Bildrand befindet
 			if (i >= 0 && i < width) {
 				//pixel aus Zeile 1
 				gradientMagnitude[i] = Integer.MAX_VALUE;
@@ -76,18 +77,46 @@ public class SeamCarving {
 	}
 
 	public void combineMagnitudeWithMask(int[] gradientMagnitude, int[] mask, int width, int height){
+		Color px_color;
+		int r, g, b;
+		int sum = 0;
+		//int maxed = 0;
 
+		//image.length = mask.length, also i = j
+		for (int i = 0; i < mask.length; i++) {
+			//zerlege int in rbg Komponenten
+			px_color = new Color(mask[i]);
+			r = px_color.getRed();
+			g = px_color.getGreen();
+			b = px_color.getBlue();
+			sum = r + g + b;
+
+			//falls alle 3 Kanäle = 0, dann pixel auf Maximalwert setzen
+			if (sum == 0) {
+				gradientMagnitude[i] = Integer.MAX_VALUE;
+				//maxed++;
+			}
+		}
+		//return maxed;
 	}
 
 	public void buildSeams(int[][] seams, long[] seamWeights, int[] gradientMagnitude, int width, int height) {
+
 	}
 
 	public void removeSeam(int[] seam, int[] image, int height, int oldWidth) {
 	}
 
 	public int[] shrink(int[] image,int[] mask, int width, int height, int newWidth) {
+		//int[] gradientMagnitude = new int[image.length];
+		//toGradientMagnitude(image, gradientMagnitude, width, height);
 
+		//System.out.println(mask.length);
+		//System.out.println(image.length);
+		//System.out.println(Arrays.toString(mask));
 
+		//System.out.println(Arrays.toString(gradientMagnitude)); //gradientMagnitude beinhaltet 2816 mal Integer.MAX_VALUE, also 2816 Randpixel
+		//System.out.println(combineMagnitudeWithMask(gradientMagnitude, mask, width, height)); //62642 pixel wurden mit Maske gesichert
 
 		return image;
 	}
