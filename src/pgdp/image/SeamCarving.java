@@ -189,7 +189,8 @@ public class SeamCarving {
 				}
 				seamWeights[i] = seamWeights[i] + gradientMagnitude[current_px];
 				//seams[i][r] wird zur Pixelnummer pro Reihe
-				seams[i][r] = current_px % width;
+				//seams[i][r] = current_px % width;
+				seams[i][r] = current_px;
 				//total_n++;
 			}
 		}
@@ -205,11 +206,16 @@ public class SeamCarving {
 	public void removeSeam(int[] seam, int[] image, int height, int oldWidth) {
 		int d_px = 0;
 		//für jeden Pixel des Seams
-		for (int i = 0; i < seam.length; ){
+		for (int i = 0; i < seam.length; i++){
 			//zu entfernendes Pixel identifizieren
-			d_px = seam[i] + oldWidth * i;
+			//d_px = seam[i] + oldWidth * i; //mit Pixelnummer pro Reihe
+			d_px = seam[i];
 
-			//
+			//alle Pixel nach diesem Pixel im Array verschieben
+			for (int r = d_px; r < image.length - 1; r++) {
+				image[r] = image[r + 1];
+			}
+			//weiß nicht ob man die nachfolgenden Pixel löschen muss
 		}
 	}
 
@@ -265,13 +271,21 @@ public class SeamCarving {
 		return lowest;
 	}
 
-	public static int find_index_array(int array[], int n) {
+	public static int find_index_array(long array[], long n) {
+		//Methode findet index von Seam mit kleinstem Gewicht
 		int index = 0;
+		for (int i = 0; i < array.length; i++) {
+			if (array[i] == n) {
+				index = i;
+				break;
+			}
+		}
 		return index;
 	}
 
-	public static int find_lowest_n_array(int array[], int n) {
-		int lowest_n = array[0];
+	public static long find_lowest_n_array(long array[]) {
+		//Methode gibt kleinstes Gewicht eines Seams zurück
+		long lowest_n = array[0];
 		for (int i = 0; i < array.length; i++) {
 			if (array[i] < lowest_n) {
 				lowest_n = array[i];
@@ -281,9 +295,25 @@ public class SeamCarving {
 	}
 
 	public int[] shrink(int[] image,int[] mask, int width, int height, int newWidth) {
-		int[] gradientMagnitude = new int[image.length];
-		toGradientMagnitude(image, gradientMagnitude, width, height);
-		combineMagnitudeWithMask(gradientMagnitude ,mask, width, height);
+		int index_seam = 0;
+		while (newWidth < width) {
+			int[][] seams = new int[width][height];
+			long[] seamWeights = new long[width];
+			int[] gradientMagnitude = new int[image.length];
+			toGradientMagnitude(image, gradientMagnitude, width, height);
+			combineMagnitudeWithMask(gradientMagnitude ,mask, width, height);
+			buildSeams(seams, seamWeights, gradientMagnitude, width, height);
+
+			//seam mit kleinstem Gewicht und kleinstem Index
+			index_seam = find_index_array(seamWeights, find_lowest_n_array(seamWeights));
+			removeSeam(seams[index_seam], image, height, width);
+			width = width - 1;
+		}
+
+
+
+
+
 
 		//System.out.println(mask.length);
 		//System.out.println(image.length);
@@ -293,7 +323,7 @@ public class SeamCarving {
 		//System.out.println(combineMagnitudeWithMask(gradientMagnitude, mask, width, height)); //62642 pixel wurden mit Maske gesichert
 		//System.out.println(image.length - height); //Ausgabe: 467250, also man soll einen vertikalen Seam löschen
 
-		buildSeams(new int[width][height], new long[width], gradientMagnitude, width, height);
+		//buildSeams(new int[width][height], new long[width], gradientMagnitude, width, height);
 		//System.out.println("n1: " + n1);
 		//System.out.println("n2: " + n2);
 		//System.out.println("n3: " + n3);
@@ -302,6 +332,8 @@ public class SeamCarving {
 		//System.out.println("c1: " + check1);
 		//System.out.println("c2: " + check2);
 		//System.out.println("c3: " + check3);
+
+
 		return image;
 	}
 
