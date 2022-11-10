@@ -209,7 +209,8 @@ public class SeamCarving {
 		for (int i = 0; i < seam.length; i++){
 			//zu entfernendes Pixel identifizieren
 			//d_px = seam[i] + oldWidth * i; //mit Pixelnummer pro Reihe
-			d_px = seam[i];
+			//"-i" weil sich der gesamte Array verändert
+			d_px = seam[i] - i;
 
 			//alle Pixel nach diesem Pixel im Array verschieben
 			for (int r = d_px; r < image.length - 1; r++) {
@@ -309,9 +310,7 @@ public class SeamCarving {
 			index_seam = find_index_array(seamWeights, find_lowest_n_array(seamWeights));
 			removeSeam(seams[index_seam], image, height, width);
 			//Werte von image in neues kleineres Array geben
-			/*for (int i = 1; i < image.length; i++) {
-				newImage[i - 1] = image[i - 1];
-			}*/
+			newImage = Arrays.copyOf(image, image.length - height);
 
 			removeSeam(seams[index_seam], mask, height, width);
 			//System.out.println(index_seam);
@@ -322,6 +321,8 @@ public class SeamCarving {
 		//width und newWidth bedeuten vermutlich etwas anderes als ich denke
 		//seamRemove funktioniert bei mir nicht richtig
 
+
+		//array clone
 
 		//System.out.println(mask.length);
 		//System.out.println(image.length);
@@ -340,7 +341,7 @@ public class SeamCarving {
 		//System.out.println("c1: " + check1);
 		//System.out.println("c2: " + check2);
 		//System.out.println("c3: " + check3);
-		return image;
+		return newImage;
 	}
 
 }
