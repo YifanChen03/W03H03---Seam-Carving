@@ -312,9 +312,6 @@ public class SeamCarving {
 
 
 
-
-
-
 		//System.out.println(mask.length);
 		//System.out.println(image.length);
 		//System.out.println(Arrays.toString(mask));
