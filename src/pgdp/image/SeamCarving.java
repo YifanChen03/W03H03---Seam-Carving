@@ -18,6 +18,9 @@ public class SeamCarving {
 	}
 
 	public void toGradientMagnitude(int[] picture, int[] gradientMagnitude, int width, int height) {
+		//System.out.println("toGradientMagnitude height " + height);
+		//System.out.println("toGradientMagnitude width " + width);
+		//System.out.println(picture.length);
 		int r1, r2;
 		int g1, g2;
 		int b1, b2;
@@ -296,13 +299,14 @@ public class SeamCarving {
 	}
 
 	public int[] shrink(int[] image,int[] mask, int width, int height, int newWidth) {
+		int round = 1;
 		int index_seam = 0;
-		int[] newImage = new int[image.length - height];
+		int[] newImage = Arrays.copyOf(image, image.length);
 		while (newWidth < width) {
 			int[][] seams = new int[width][height];
 			long[] seamWeights = new long[width];
 			int[] gradientMagnitude = new int[image.length];
-			toGradientMagnitude(image, gradientMagnitude, width, height);
+			toGradientMagnitude(newImage, gradientMagnitude, width, height);
 			combineMagnitudeWithMask(gradientMagnitude ,mask, width, height);
 			buildSeams(seams, seamWeights, gradientMagnitude, width, height);
 
@@ -310,17 +314,19 @@ public class SeamCarving {
 			index_seam = find_index_array(seamWeights, find_lowest_n_array(seamWeights));
 			removeSeam(seams[index_seam], image, height, width);
 			//Werte von image in neues kleineres Array geben
-			newImage = Arrays.copyOf(image, image.length - height);
+			newImage = Arrays.copyOf(image, image.length - height * round);
 
 			removeSeam(seams[index_seam], mask, height, width);
 			//System.out.println(index_seam);
 			//System.out.println(Arrays.toString(seams[index_seam]));
 			width--;
+			round++;
 		}
+		//System.out.println(Arrays.toString(image));
 		//width wird verändert
 		//width und newWidth bedeuten vermutlich etwas anderes als ich denke
-		//seamRemove funktioniert bei mir nicht richtig
 
+		//wenn ich einen Seam lösche also 534 pixel, dann kann ich für mein
 
 		//array clone
 
