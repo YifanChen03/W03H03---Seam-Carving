@@ -296,6 +296,7 @@ public class SeamCarving {
 
 	public int[] shrink(int[] image,int[] mask, int width, int height, int newWidth) {
 		int index_seam = 0;
+		int[] newImage = new int[image.length - height];
 		while (newWidth < width) {
 			int[][] seams = new int[width][height];
 			long[] seamWeights = new long[width];
@@ -307,9 +308,19 @@ public class SeamCarving {
 			//seam mit kleinstem Gewicht und kleinstem Index
 			index_seam = find_index_array(seamWeights, find_lowest_n_array(seamWeights));
 			removeSeam(seams[index_seam], image, height, width);
-			width = width - 1;
-		}
+			//Werte von image in neues kleineres Array geben
+			/*for (int i = 1; i < image.length; i++) {
+				newImage[i - 1] = image[i - 1];
+			}*/
 
+			removeSeam(seams[index_seam], mask, height, width);
+			//System.out.println(index_seam);
+			//System.out.println(Arrays.toString(seams[index_seam]));
+			width--;
+		}
+		//width wird verändert
+		//width und newWidth bedeuten vermutlich etwas anderes als ich denke
+		//seamRemove funktioniert bei mir nicht richtig
 
 
 		//System.out.println(mask.length);
@@ -329,8 +340,6 @@ public class SeamCarving {
 		//System.out.println("c1: " + check1);
 		//System.out.println("c2: " + check2);
 		//System.out.println("c3: " + check3);
-
-
 		return image;
 	}
 
