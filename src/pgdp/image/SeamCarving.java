@@ -208,19 +208,34 @@ public class SeamCarving {
 
 	public void removeSeam(int[] seam, int[] image, int height, int oldWidth) {
 		int d_px = 0;
+		int[] temp_image = new int[image.length - seam.length];
 		//für jeden Pixel des Seams
 		for (int i = 0; i < seam.length; i++){
 			//zu entfernendes Pixel identifizieren
 			//d_px = seam[i] + oldWidth * i; //mit Pixelnummer pro Reihe
 			//"-i" weil sich der gesamte Array verändert
-			d_px = seam[i] - i;
+			d_px = seam[i] - i; //works v1
 
 			//alle Pixel nach diesem Pixel im Array verschieben
-			for (int r = d_px; r < image.length - 1; r++) {
+			for (int r = d_px; r < image.length - 1; r++) { //works v1
 				image[r] = image[r + 1];
 			}
 			//weiß nicht ob man die nachfolgenden Pixel löschen muss
 		}
+		/*for (int i = 0, r = 0; i < temp_image.length; i++) { //v2
+			if (r < seam.length) {
+				d_px = seam[r];
+			}
+			if (i == d_px) {
+				r++;
+				continue;
+			}
+			temp_image[i] = image[i];
+		}*/
+		//füge Werte wieder in image[] ein
+		//image = Arrays.copyOf(temp_image, image.length); //v2
+		//System.out.println(Arrays.toString(image));
+		//mach es zu pixelnummer pro reihe
 	}
 
 	public static int find_lowest_weight(int[] gradientMagnitude, int p1, int p2, int p3) {
@@ -304,6 +319,7 @@ public class SeamCarving {
 		int[] newImage = Arrays.copyOf(image, image.length);
 		while (newWidth < width) {
 			int[][] seams = new int[width][height];
+			//int[] showSeam = new int[width];
 			long[] seamWeights = new long[width];
 			int[] gradientMagnitude = new int[image.length];
 			toGradientMagnitude(newImage, gradientMagnitude, width, height);
@@ -318,7 +334,8 @@ public class SeamCarving {
 
 			removeSeam(seams[index_seam], mask, height, width);
 			//System.out.println(index_seam);
-			//System.out.println(Arrays.toString(seams[index_seam]));
+			/*showSeam[round - 1] = seams[index_seam][0] % width;
+			System.out.println(showSeam[round - 1] + " ");*/
 			width--;
 			round++;
 		}
@@ -339,7 +356,7 @@ public class SeamCarving {
 		//System.out.println(image.length - height); //Ausgabe: 467250, also man soll einen vertikalen Seam löschen
 
 		//buildSeams(new int[width][height], new long[width], gradientMagnitude, width, height);
-		//System.out.println("n1: " + n1);
+		//System.out.println("n1: " + n1); //n1: 128108 n2: 216880 n3: 121920 bei newWidth = 875
 		//System.out.println("n2: " + n2);
 		//System.out.println("n3: " + n3);
 		//System.out.println(height + " " + width);
@@ -349,5 +366,4 @@ public class SeamCarving {
 		//System.out.println("c3: " + check3);
 		return newImage;
 	}
-
 }
